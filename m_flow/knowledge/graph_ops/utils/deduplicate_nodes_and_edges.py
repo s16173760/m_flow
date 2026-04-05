@@ -12,20 +12,21 @@ def deduplicate_nodes_and_edges(
     edges: List[Any],
 ) -> Tuple[List[MemoryNode], List[Any]]:
     """Remove duplicate nodes and edges based on their IDs."""
-    seen: Dict[str, bool] = {}
+    seen_nodes: Dict[str, bool] = {}
+    seen_edges: Dict[str, bool] = {}
     unique_nodes: List[MemoryNode] = []
     unique_edges: List[Any] = []
 
     for node in nodes:
         key = str(node.id)
-        if key not in seen:
+        if key not in seen_nodes:
             unique_nodes.append(node)
-            seen[key] = True
+            seen_nodes[key] = True
 
     for edge in edges:
-        key = f"{edge[0]}{edge[2]}{edge[1]}"
-        if key not in seen:
+        key = f"{edge[0]}|{edge[2]}|{edge[1]}"
+        if key not in seen_edges:
             unique_edges.append(edge)
-            seen[key] = True
+            seen_edges[key] = True
 
     return unique_nodes, unique_edges

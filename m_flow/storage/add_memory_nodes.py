@@ -94,8 +94,9 @@ async def _commit_to_graph(
     await graph_engine.add_edges(edges)
 
     if extra_edges:
-        await graph_engine.add_edges(extra_edges)
-        edges.extend(extra_edges)
+        _, deduped_extra = deduplicate_nodes_and_edges([], extra_edges)
+        await graph_engine.add_edges(deduped_extra)
+        edges.extend(deduped_extra)
         _log.info(f"[commit] Added {len(extra_edges)} extra edges")
 
     _log.info("[commit] Phase 1 complete: Graph structure written successfully")

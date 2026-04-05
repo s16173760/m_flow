@@ -614,7 +614,7 @@ class KuzuAdapter(GraphProvider):
             return
 
         now = _utc_now_str()
-        items = []
+        items_by_id = {}
 
         for n in nodes:
             props = n.model_dump() if hasattr(n, "model_dump") else vars(n)
@@ -624,15 +624,22 @@ class KuzuAdapter(GraphProvider):
 
             created_at_str = _ms_to_utc_str(node_created_at) if node_created_at is not None else now
 
-            items.append(
-                {
-                    "id": str(props.pop("id", "")),
-                    "name": str(props.pop("name", "")),
-                    "type": str(props.pop("type", "")),
-                    "properties": _dump_props(props),
-                    "created_at": created_at_str,
-                    "updated_at": now,
-                }
+            node_id = str(props.pop("id", ""))
+            items_by_id[node_id] = {
+                "id": node_id,
+                "name": str(props.pop("name", "")),
+                "type": str(props.pop("type", "")),
+                "properties": _dump_props(props),
+                "created_at": created_at_str,
+                "updated_at": now,
+            }
+
+        items = list(items_by_id.values())
+
+        if len(items) < len(nodes):
+            _log.info(
+                f"add_nodes: deduped {len(nodes)} → {len(items)} "
+                f"({len(nodes) - len(items)} duplicates removed)"
             )
 
         cypher_bulk = """
@@ -655,11 +662,16 @@ class KuzuAdapter(GraphProvider):
             await self.query(cypher_bulk, {"items": items})
             _log.debug(f"Processed {len(items)} nodes")
         except RuntimeError as err:
-            if "Write-write conflict" not in str(err):
+            err_str = str(err).lower()
+            is_recoverable = (
+                "write-write conflict" in err_str
+                or ("duplicat" in err_str and "key" in err_str)
+            )
+            if not is_recoverable:
                 _log.error(f"add_nodes batch failed: {err}")
                 raise
             _log.warning(
-                f"add_nodes: write-write conflict on bulk MERGE ({len(items)} nodes), "
+                f"add_nodes: batch conflict on bulk MERGE ({len(items)} nodes), "
                 f"falling back to sequential writes"
             )
             cypher_single = """
@@ -869,6 +881,19 @@ class KuzuAdapter(GraphProvider):
         if not edges:
             return
 
+        seen = {}
+        for e in edges:
+            key = (str(e[0]), str(e[1]), str(e[2]))
+            seen[key] = e
+        deduped = list(seen.values())
+
+        if len(deduped) < len(edges):
+            _log.info(
+                f"add_edges: deduped {len(edges)} → {len(deduped)} "
+                f"({len(edges) - len(deduped)} duplicates removed)"
+            )
+        edges = deduped
+
         partitions = _partition_edges_by_endpoints(edges)
         now = _utc_now_str()
 
@@ -906,12 +931,16 @@ class KuzuAdapter(GraphProvider):
             try:
                 await self.query(cypher_bulk, {"items": items})
             except RuntimeError as err:
-                if "Write-write conflict" not in str(err):
+                err_str = str(err).lower()
+                is_recoverable = (
+                    "write-write conflict" in err_str
+                    or ("duplicat" in err_str and "key" in err_str)
+                )
+                if not is_recoverable:
                     _log.error(f"add_edges batch {batch_idx} failed: {err}")
                     raise
-                # Safety fallback: sequential writes for this batch
                 _log.warning(
-                    f"add_edges: unexpected write conflict in partitioned batch "
+                    f"add_edges: batch conflict in partitioned batch "
                     f"{batch_idx} ({len(items)} edges), falling back to sequential"
                 )
                 cypher_single = """
