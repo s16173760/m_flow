@@ -76,6 +76,8 @@ def _get_param_sets() -> Tuple[Set[str], Set[str]]:
         "facet_points_prompt_file",
         # Content type for sentence splitting (required when enable_content_routing=True)
         "content_type",
+        # Precise summarization mode
+        "precise_mode",
         # Not on memorize() signature; ingest maps it to memorize incremental only
         "memorize_incremental_loading",
     }

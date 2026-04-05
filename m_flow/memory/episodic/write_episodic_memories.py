@@ -199,6 +199,7 @@ async def write_episodic_memories(
     # Unified episodic + procedural routing
     enable_procedural_routing: bool = False,
     procedural_decisions_out: Optional[List[dict]] = None,
+    precise_mode: bool = False,
 ) -> List[Any]:
     """
     Episodic write (cross-batch incremental update):
@@ -546,6 +547,7 @@ async def write_episodic_memories(
             facet_points_prompt_file=facet_points_prompt_file,
             max_point_aliases_text_chars=max_point_aliases_text_chars,
             content_routing_disabled=not has_sentence_routing,
+            precise_mode=precise_mode,
         )
 
         # Build EpisodeContext
@@ -713,6 +715,7 @@ def _build_episode_config(
     facet_points_prompt_file: Optional[str],
     max_point_aliases_text_chars: int = 400,
     content_routing_disabled: bool = False,
+    precise_mode: bool = False,
 ) -> EpisodeConfig:
     """
     Build EpisodeConfig from individual parameters.
@@ -740,6 +743,7 @@ def _build_episode_config(
         facet_points_prompt_file=facet_points_prompt_file,
         max_point_aliases_text_chars=max_point_aliases_text_chars,
         content_routing_disabled=content_routing_disabled,
+        precise_mode=precise_mode,
     )
 
 

@@ -549,6 +549,7 @@ export interface MemorizeRequest {
   enable_content_routing?: boolean;
   enable_procedural?: boolean;
   enable_semantic_merge?: boolean;
+  precise_mode?: boolean;
   enable_facet_points?: boolean;
 }
 
@@ -584,6 +585,7 @@ export interface IngestTextRequest {
   enable_content_routing?: boolean;
   enable_procedural?: boolean;
   enable_facet_points?: boolean;
+  precise_mode?: boolean;
   content_type?: string;
   conflict_mode?: ConflictMode;
 }
@@ -607,6 +609,7 @@ export interface IngestUploadOptions {
   enableContentRouting?: boolean;
   enableProcedural?: boolean;
   enableFacetPoints?: boolean;
+  preciseMode?: boolean;
   conflictMode?: ConflictMode;
 }
 

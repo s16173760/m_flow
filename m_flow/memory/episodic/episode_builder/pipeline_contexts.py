@@ -85,6 +85,7 @@ class EpisodeConfig:
     # Content routing state — when True, summarize_by_event uses the naming-aware
     # prompt to generate an Episode name (since content routing was not run).
     content_routing_disabled: bool = False
+    precise_mode: bool = False
 
 
 # ============================================================

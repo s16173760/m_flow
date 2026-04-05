@@ -135,6 +135,12 @@ class MemorizePayloadDTO(InDTO):
         description="Enable relationship edge extraction between entities. "
                     "Default: true."
     )
+    precise_mode: Optional[bool] = Field(
+        default=None,
+        description="Enable precise summarization: preserves all factual details (dates, numbers, names) "
+                    "with lower compression ratio — RAG context will be longer but more accurate. "
+                    "Default: uses MFLOW_PRECISE_MODE env var (false)."
+    )
 
 
 def get_memorize_router() -> APIRouter:
@@ -236,6 +242,8 @@ def get_memorize_router() -> APIRouter:
                 kwargs["enable_facet_points"] = payload.enable_facet_points
             if payload.extract_relationships is not None:
                 kwargs["extract_relationships"] = payload.extract_relationships
+            if payload.precise_mode is not None:
+                kwargs["precise_mode"] = payload.precise_mode
 
             memorize_run = await m_flow_memorize(
                 datasets,

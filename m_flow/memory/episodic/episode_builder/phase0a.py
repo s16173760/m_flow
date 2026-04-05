@@ -324,12 +324,21 @@ async def _task_generate_facets(
                             f"search_text='{candidate.search_text[:50]}...'"
                         )
                 else:
+                    _precise = getattr(config, "precise_mode", False)
+                    _date_hdr = ""
+                    if _precise and reference_date is not None:
+                        from m_flow.knowledge.summarization.summarize_by_event import _format_reference_date
+                        _fmt = _format_reference_date(reference_date)
+                        if _fmt:
+                            _date_hdr = f"[Session Date: {_fmt}]"
                     result = await summarize_by_event(
                         event_sentences=event_sentences,
                         event_topic=event_topic,
                         is_atomic=is_atomic,
                         reference_date=reference_date,
                         generate_episode_name=content_routing_disabled,
+                        precise_mode=_precise,
+                        session_date_header=_date_hdr,
                     )
                     from m_flow.knowledge.summarization.summarize_by_event import SummarizeResult
                     if content_routing_disabled and isinstance(result, SummarizeResult):

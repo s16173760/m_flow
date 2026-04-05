@@ -370,6 +370,11 @@ async def get_default_tasks(
     # Extract content_type for sentence splitting strategy
     content_type = kwargs.pop("content_type", ContentType.TEXT)
 
+    # Precise mode: two-step summarization (JSON section routing + per-section compression)
+    precise_mode = kwargs.pop("precise_mode", _env_bool("MFLOW_PRECISE_MODE", False))
+    if precise_mode:
+        logger.info("[memorize] Precise summarization mode enabled")
+
     # Episodic memory layer: kwargs > MFLOW_EPISODIC_ENABLED > true
     if enable_episodic_override is not None:
         episodic_enabled = enable_episodic_override
@@ -418,7 +423,7 @@ async def get_default_tasks(
                     task_config={"batch_size": chunks_per_batch},
                 )
             else:
-                return Stage(write_episodic_memories, task_config={"batch_size": chunks_per_batch})
+                return Stage(write_episodic_memories, precise_mode=precise_mode, task_config={"batch_size": chunks_per_batch})
 
         memory_task = _build_memory_task()
 
@@ -469,7 +474,7 @@ async def get_default_tasks(
                 logger.info("[memorize] Parallel execution: Episodic + Procedural")
                 return execute_parallel(
                     [
-                        Stage(write_episodic_memories, task_config={"batch_size": chunks_per_batch}),
+                        Stage(write_episodic_memories, precise_mode=precise_mode, task_config={"batch_size": chunks_per_batch}),
                         Stage(
                             write_procedural_memories, task_config={"batch_size": chunks_per_batch}
                         ),
@@ -478,7 +483,7 @@ async def get_default_tasks(
                     deduplicate=True,
                 )
             elif episodic_enabled:
-                return Stage(write_episodic_memories, task_config={"batch_size": chunks_per_batch})
+                return Stage(write_episodic_memories, precise_mode=precise_mode, task_config={"batch_size": chunks_per_batch})
             elif procedural_enabled:
                 return Stage(write_procedural_memories, task_config={"batch_size": chunks_per_batch})
             else:

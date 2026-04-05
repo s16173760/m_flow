@@ -153,6 +153,7 @@ interface IngestAdvancedOptions {
   enableContentRouting: boolean | undefined;
   enableProcedural: boolean | undefined;
   enableFacetPoints: boolean | undefined;
+  preciseMode: boolean | undefined;
   contentType: "text" | "dialog";
 }
 
@@ -168,6 +169,7 @@ const DEFAULT_INGEST_OPTIONS: IngestAdvancedOptions = {
   enableContentRouting: undefined,
   enableProcedural: undefined,
   enableFacetPoints: undefined,
+  preciseMode: undefined,
   contentType: "text",
 };
 
@@ -380,6 +382,7 @@ export function IngestPage() {
           enable_content_routing: options.enableContentRouting,
           enable_procedural: options.enableProcedural,
           enable_facet_points: options.enableFacetPoints,
+          precise_mode: options.preciseMode,
           content_type: options.contentType,
           conflict_mode: conflictMode,
         });
@@ -427,6 +430,7 @@ export function IngestPage() {
             enableEpisodeRouting: options.enableEpisodeRouting,
             enableContentRouting: options.enableContentRouting,
             enableProcedural: options.enableProcedural,
+            preciseMode: options.preciseMode,
             conflictMode,
           },
         });
@@ -982,6 +986,29 @@ export function IngestPage() {
                     <Switch
                       checked={options.enableFacetPoints === true}
                       onCheckedChange={(v) => handleOptionChange("enableFacetPoints", v ? true : (options.enableFacetPoints === true ? false : undefined))}
+                      disabled={isProcessing}
+                    />
+                  </div>
+                </div>
+
+                {/* Precise Summarization */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-[var(--text-secondary)]">Precise Summarization</span>
+                    <div className="group relative">
+                      <Info size={12} className="text-[var(--text-muted)] cursor-help" />
+                      <div className="absolute bottom-full left-0 mb-1 px-2 py-1 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded text-[10px] text-[var(--text-muted)] w-52 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                        Preserves all original factual information (dates, numbers, names, constraints) with lower compression — RAG context will be longer but more accurate. Slower processing.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-[var(--text-muted)]">
+                      {options.preciseMode === undefined ? "Auto" : options.preciseMode ? "On" : "Off"}
+                    </span>
+                    <Switch
+                      checked={options.preciseMode === true}
+                      onCheckedChange={(v) => handleOptionChange("preciseMode", v ? true : (options.preciseMode === true ? false : undefined))}
                       disabled={isProcessing}
                     />
                   </div>

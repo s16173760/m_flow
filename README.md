@@ -75,8 +75,11 @@ Evaluation scripts, methodology details, and reproduction steps: [mflow-benchmar
 | **50+ file formats** | PDFs, DOCX, HTML, Markdown, images, audio, and more |
 | **Multi-DB support** | LanceDB, Neo4j, PostgreSQL/pgvector, ChromaDB, KùzuDB, Pinecone |
 | **LLM-agnostic** | OpenAI, Anthropic, Mistral, Groq, Ollama, LLaMA-Index, LangChain |
+| **Precise summarization** | Preserves all factual details (dates, numbers, names) at the cost of lower compression — RAG context will be longer but more accurate |
 | **MCP server** | Expose memory as Model Context Protocol tools for any IDE |
 | **CLI & Web UI** | Interactive console, knowledge graph visualization, config wizard |
+
+> **Retrieval modes**: **Episodic** is the primary retrieval mode — it uses graph-routed Bundle Search for best accuracy and is used in all benchmarks. **Triplet Completion** is a simpler vector-based mode suited for customization and secondary development. See [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md) for details.
 
 ## Quick Start
 

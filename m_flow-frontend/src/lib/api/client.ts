@@ -624,6 +624,9 @@ export class MflowApiClient {
     if (options.enableFacetPoints !== undefined) {
       formData.append("enable_facet_points", String(options.enableFacetPoints));
     }
+    if (options.preciseMode !== undefined) {
+      formData.append("precise_mode", String(options.preciseMode));
+    }
     if (options.conflictMode) {
       formData.append("conflict_mode", options.conflictMode);
     }

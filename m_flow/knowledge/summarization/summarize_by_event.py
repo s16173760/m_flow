@@ -118,6 +118,8 @@ async def summarize_by_event(
     include_procedural_routing: bool = False,
     reference_date: Optional[Union[int, datetime]] = None,
     generate_episode_name: bool = False,
+    precise_mode: bool = False,
+    session_date_header: str = "",
 ) -> Union[List[Section], SummarizeResult]:
     """
     Generate sections for a single event
@@ -133,6 +135,9 @@ async def summarize_by_event(
         generate_episode_name: When True (content routing disabled), use the naming-aware
                               prompt and return SummarizeResult with episode_name populated.
                               When False (content routing enabled), return List[Section] as before.
+        precise_mode: When True, use two-step pipeline (JSON routing + per-section concurrent
+                     compression with anchor verification). When False, use original single-prompt.
+        session_date_header: Session date line to inject into each section (precise_mode only).
 
     Returns:
         List[Section] when generate_episode_name=False (backward compatible),
@@ -145,7 +150,8 @@ async def summarize_by_event(
         f"combined_text_len={len(combined_text)}, "
         f"combined_text_full={combined_text[:1000]!r}, "
         f"event_topic={event_topic!r}, is_atomic={is_atomic}, "
-        f"generate_episode_name={generate_episode_name}"
+        f"generate_episode_name={generate_episode_name}, "
+        f"precise_mode={precise_mode}"
     )
 
     if not combined_text.strip():
@@ -154,6 +160,30 @@ async def summarize_by_event(
             return SummarizeResult(sections=[], episode_name="")
         return []
 
+    # Precise mode: two-step pipeline
+    if precise_mode and not is_atomic:
+        from m_flow.knowledge.summarization.precise_summarize import (
+            precise_summarize_by_event,
+        )
+        try:
+            sections = await precise_summarize_by_event(
+                event_sentences=event_sentences,
+                event_topic=event_topic,
+                session_date_header=session_date_header,
+            )
+            logger.info(
+                f"[summarize_by_event] Precise mode: {len(sections)} sections"
+            )
+            if generate_episode_name:
+                ep_name = sections[0].heading if sections else event_topic
+                return SummarizeResult(sections=sections, episode_name=ep_name)
+            return sections
+        except Exception as e:
+            logger.warning(
+                f"[summarize_by_event] Precise mode failed: {e}, falling back to original"
+            )
+
+    # Original mode: single-prompt
     # Wrap content in explicit tags to prevent LLM from treating it as an instruction
     wrapped_text = f"<source_text>\n{combined_text}\n</source_text>"
 

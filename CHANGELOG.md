@@ -5,6 +5,20 @@ All notable changes to M-flow will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2026-04-05
+
+### Added
+- Precise summarization mode (`precise_mode`): preserves all original factual information
+  (dates, numbers, names, constraints) with lower compression ratio — RAG context will be
+  longer but more accurate. Uses two-step pipeline: JSON topic routing + per-section
+  concurrent compression with anchor verification
+- Configurable via API parameter, environment variable (`MFLOW_PRECISE_MODE`), or frontend toggle
+- KuzuDB adapter: entry-level deduplication and broadened error recovery for batch operations
+
+### Fixed
+- KuzuDB "duplicated primary key" crash in UNWIND+MERGE operations
+- Edge deduplication key collision in `deduplicate_nodes_and_edges`
+
 ## [0.3.1] - 2026-03-28
 
 ### Added
