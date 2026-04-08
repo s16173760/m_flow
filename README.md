@@ -50,21 +50,24 @@ Retrieval is **graph-routed**: the system casts a wide net across all levels, pr
 
 ## Benchmark
 
-Dataset: [LoCoMo-10](https://github.com/snap-stanford/locomo) (10 conversations, 1540 questions) · Retrieval: EpisodicRetriever · Judge LLM: gpt-4o-mini
+Dataset: [LoCoMo-10](https://github.com/snap-research/LoCoMo) (10 conversations, 1541 questions) · Retrieval: EpisodicRetriever · Answer LLM: gpt-5-mini · Judge LLM: gpt-4o-mini
 
-| System | LLM-Judge | BLEU-1 | F1 |
-|--------|-----------|--------|-----|
-| **M-flow** | **76.5%** | **0.422** | **0.503** |
-| Mem0 Cloud (tested) | 40.4% | 0.186 | 0.196 |
+| System | LLM-Judge | Top-K |
+|--------|:---------:|:-----:|
+| **M-flow** | **81.8%** | 10 |
+| Cognee Cloud | 79.4% | 10 |
+| Zep Cloud | 73.4% | 10 |
+| Mem0ᵍ (published) | 68.5% | — |
+| Supermemory | 64.4% | 10 |
 
-| Category | M-flow | Mem0 Cloud (tested) |
-|----------|--------|---------------------|
-| Single-hop (factual) | 68.5% | 44.7% |
-| Temporal reasoning | **78.8%** | 7.5% |
-| Multi-hop reasoning | 48.0% | 39.6% |
-| Open-domain (event detail) | **81.5%** | 49.1% |
+| Cat | Type | M-flow |
+|:---:|------|:------:|
+| 4 | Single-hop | **87.6%** |
+| 2 | Temporal | 79.4% |
+| 1 | Multi-hop | 75.2% |
+| 3 | Open-domain | 58.3% |
 
-Evaluation scripts, methodology details, and reproduction steps: [mflow-benchmarks](https://github.com/FlowElement-ai/mflow-benchmarks/tree/main/benchmarks/locomo)
+Category mapping per [snap-research/locomo Issue #27](https://github.com/snap-research/LoCoMo/issues/27). Full results, reproduction scripts, and methodology for all systems: [mflow-benchmarks](https://github.com/FlowElement-ai/mflow-benchmarks)
 
 ## Features
 
