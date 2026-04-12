@@ -49,26 +49,29 @@ Retrieval is **graph-routed**: the system casts a wide net across all levels, pr
 
 > For the full technical deep-dive, see [Retrieval Architecture](docs/RETRIEVAL_ARCHITECTURE.md) | [检索架构详解（中文）](docs/RETRIEVAL_ARCHITECTURE_ZH.md)
 
-## Benchmark
+## Benchmarks
 
-Dataset: [LoCoMo-10](https://github.com/snap-research/LoCoMo) (10 conversations, 1541 questions) · Retrieval: EpisodicRetriever · Answer LLM: gpt-5-mini · Judge LLM: gpt-4o-mini
+All benchmarks use gpt-5-mini (answer) + gpt-4o-mini (judge) + top-k=10.
 
-| System | LLM-Judge | Top-K |
-|--------|:---------:|:-----:|
-| **M-flow** | **81.8%** | 10 |
-| Cognee Cloud | 79.4% | 10 |
-| Zep Cloud | 73.4% | 10 |
-| Mem0ᵍ (published) | 68.5% | — |
-| Supermemory Cloud | 64.4% | 10 |
+### LoCoMo-10 (long-term conversational memory, 1540 questions)
 
-| Cat | Type | M-flow |
-|:---:|------|:------:|
-| 4 | Single-hop | **87.6%** |
-| 2 | Temporal | 79.4% |
-| 1 | Multi-hop | 75.2% |
-| 3 | Open-domain | 58.3% |
+| System | LLM-Judge |
+|--------|:---------:|
+| **M-flow** | **81.8%** |
+| Cognee Cloud | 79.4% |
+| Zep Cloud | 73.4% |
+| Supermemory Cloud | 64.4% |
 
-Category mapping per [snap-research/locomo Issue #27](https://github.com/snap-research/LoCoMo/issues/27). Full results, reproduction scripts, and methodology for all systems: [mflow-benchmarks](https://github.com/FlowElement-ai/mflow-benchmarks)
+### LongMemEval Oracle (long-term interactive memory, first 100 questions)
+
+| System | LLM-Judge |
+|--------|:---------:|
+| **M-flow** | **89%** |
+| Supermemory Cloud | 74% |
+| Mem0 | 71% |
+| Zep Cloud | 61% |
+
+Per-category breakdowns, reproduction scripts, raw data, and methodology for all systems: [mflow-benchmarks](https://github.com/FlowElement-ai/mflow-benchmarks)
 
 ## Features
 
