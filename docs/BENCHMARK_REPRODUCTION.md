@@ -102,7 +102,7 @@ Key ingestion parameters (passed in the API payload):
 
 ```json
 {
-  "enable_episode_routing": true,
+  "enable_episode_routing": false,
   "precise_mode": true
 }
 ```
